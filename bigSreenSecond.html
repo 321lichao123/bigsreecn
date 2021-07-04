@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>菁蓝教育展示大屏</title>
+  <link href="./css/base.css" rel="stylesheet" type="text/css"/>
+  <link rel="stylesheet" type="text/css" href="./css/index.css">
+  <style>
+    .show-user-info {
+      margin-bottom: 27px;
+      height: 143px;
+      font-size: 40px;
+      color: #fff;
+    }
+    .user-info-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+      height: 100%;
+    }
+    .user-info-content > div {
+      width: 13%;
+      text-align: center;
+    }
+    .user-info-content > div div:last-child {
+      font-size: 22px;
+      color: #CFD7F3;
+      letter-spacing: 2px;
+      margin-top: 5px;
+    }
+    .points-mall {
+      padding: 8px 18px 18px;
+      height: 675px;
+      background-image: url(./images/pointsbg.png);
+    }
+    .points-mall .right-table-title {
+      margin-bottom: 18px;
+      width: 34.37%;
+      height: 49px;
+      /* background: linear-gradient(270deg, rgba(10, 188, 240, 0) 0%, rgba(10, 187, 239, 0.71) 51%, rgba(9, 188, 240, 0) 100%); */
+      opacity: 0.41;
+      font-size: 24px;
+      font-weight: 600;
+      color: #09BAEE;
+      line-height: 33px;
+      letter-spacing: 2px;
+      margin: 0 auto;
+      text-align: center;
+      line-height: 49px;
+      margin-bottom: 30px;
+      background-image: url(./images/left-title.png);
+    }
+    .el-select {
+      width: 23.38%;
+      margin-right: 1.67%;
+      height: 56px;
+    }
+    .el-select .el-input {
+      height: 56px;
+    }
+    .el-select .el-input input {
+      height: 100%;
+      box-shadow: 0px 0px 13px 8px rgb(35 111 132 / 50%) inset;
+      background: #010233;
+      border: none;
+      font-size: 1.25rem;
+      color: #CFD7F3;
+      /* border: 1px dashed #888888; */
+    }
+    .sreach-condition {
+      margin-bottom: 21px;
+    }
+    .infinite-list-wrapper {
+      overflow: auto;
+      height: 500px;
+      margin-right: -39px;
+    }
+    .infinite-list-wrapper::-webkit-scrollbar { width: 0 !important; }
+    .roll-list {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 0;
+      height: 448px;
+      margin-top: 0;
+    }
+    .goods-list-item {
+      width: 15.36%;
+      margin-right: 1.19%;
+      margin-bottom: 27px;
+      list-style: none;
+    }
+    .goods-list-item:nth-child(6n) {
+      margin-right: 0;
+    }
+    .goods-list-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 35px;
+    }
+    .goods-list-item > .goods-box {
+      margin-bottom: 12px;
+      height: 164px;
+    }
+    .goods-list-item > .goods-box img {
+      width: 100%;
+      height: 100%;
+    }
+    .goods-list-item .goods-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #CFD7F3;
+    }
+    .goods-name {
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+    .goods-integral-number {
+      font-size: 26px;
+      margin-right: 3px;
+    }
+    .goods-integral {
+      font-size: 12px;
+    }
+    .goods-gradeName {
+      padding: 7px 8px;
+      font-size: 14px;
+      text-align: center;
+      border: 1px solid #CFD7F3;
+      border-radius: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div id='big-sreen-second' class="bg-common-style bg-common-img">
+    <!-- 头部搜索 -->
+    <div class="header-sreach-box">
+      <div class="sreach-input-position">
+        <i class="icon-search bg-common-style"></i>
+        <el-input v-model="sreachValue" placeholder="请输入内容"></el-input>
+        <el-button @click="sreach" class="border-common-style" style="border: 1px dashed #888888;">搜索</el-button>
+      </div>
+    </div>
+    <div class="show-user-info border-common-style">
+      <div class="user-info-content">
+        <div>
+          <div>{{userInfo.rowNo}}</div>
+          <div>排名</div>
+        </div>
+        <div>
+          <div>{{userInfo.studentNumber}}</div>
+          <div>学号</div>
+        </div>
+        <div>
+          <div>{{userInfo.studentName}}</div>
+          <div>姓名</div>
+        </div>
+        <div>
+          <div>{{userInfo.integral}}</div>
+          <div>积分</div>
+        </div>
+      </div>
+    </div>
+    <div class="points-mall border-common-style">
+      <div class="right-table-title bg-common-style">积分排行</div>
+      <div class="sreach-condition">
+        <el-select v-model="fwId" placeholder="积分范围" @change="changePoint">
+          <el-option
+            v-for="item in pointsOption"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+        <el-select v-model="fwId" placeholder="兑换限制">
+          <el-option
+            v-for="item in pointsOption"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </div>
+      <div class="infinite-list-wrapper">
+        <ul
+          class="roll-list"
+          v-infinite-scroll="rollLoad"
+          infinite-scroll-disabled="rollDisabled">
+          <li v-for="(item, index) in pointsData" :key="index" class="goods-list-item">
+            <div class="goods-box">
+              <img :src="item.goodsImg" :alt="item.goodsName" />
+            </div>
+            <div class="goods-info">
+              <span style="display: flex;flex-direction: column;">
+                <span class="goods-name">{{item.goodsName}}</span>
+                <span class="goods-gradeName">{{item.exchangeGradeName}}</span>
+              </span>
+              <span>
+                <span class="goods-integral-number">{{item.neededIntegral}}</span>
+                <span class="goods-integral">积分</span>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <div>
+          <p v-if="loading">加载中...</p>
+          <p v-if="onMore">没有更多了</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="./js/jquery.js"></script>
+<script src="./js/vue.js"></script>
+<script src="./elemntUI/index.js"></script>
+<script>
+  new Vue({
+    el: '#big-sreen-second',
+    data() {
+      return {
+        sreachValue: '',
+        baseUrl: 'https://tyapi.znzkj.net/',
+        userInfo: {},
+        pointsOption: [],
+        fwId: "",
+        pointsData: [],
+        page: 1,
+        totalPage: 0,
+        loading: false
+      }
+    },
+    created() {
+      this.getUserInfo();
+      this.getPointsShop();
+      this.getPointsList();
+    },
+    computed: {
+      rollDisabled() {
+        return this.loading || this.onMore;
+      },
+      onMore() {
+        return this.page >= this.totalPage;
+      }
+    },
+    methods: {
+      sreach() {
+        
+      },
+      changePoint(value) {
+        this.fwId = value;
+        this.getPointsShop()
+      },
+      rollLoad() {
+        setTimeout(() => {
+          this.page++;
+          this.getPointsShop();
+        }, 2000);
+      },
+      getPointsList() {
+        let that = this;
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/sysdict/getListByType`,
+          data: JSON.stringify({type: "7"}),
+          contentType: "application/json",
+          success: function(r){
+            that.pointsOption = {...r.object};
+          }
+        });
+      },
+      getUserInfo(studentNumber) {
+        let that = this;
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/user/queryUserInfoByStudentNumber`,
+          data: JSON.stringify({studentNumber: "2021050813"}),
+          contentType: "application/json",
+          success: function(r){
+            that.userInfo = {...r.object};
+          }
+        });
+      },
+      getPointsShop() {
+        let that = this;
+        let params = {
+          page: this.page,
+          limit: 12,
+          type: 1,
+        }
+        this.fwId && (params.fwId = this.fwId);
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/goods/list`,
+          data: JSON.stringify(params),
+          contentType: "application/json",
+          success: function(r){
+            that.pointsData.push(...r.page.list);
+            that.totalPage = r.page.totalPage;
+          }
+        });
+      }
+    }
+  })
+</script>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>菁蓝教育展示大屏</title>
+  <link href="./css/base.css" rel="stylesheet" type="text/css"/>
+  <link rel="stylesheet" type="text/css" href="./css/index.css">
+  <link rel="stylesheet" type="text/css" href="./css/html.css">
+</head>
+<body>
+  <div id="big-sreen">
+    <router-link to="/bigSreenFrist"></router-link>
+    <router-link to="/bigSreenSecond"></router-link>
+    <router-view></router-view>
+  </div>
+</body>
+<script src="./js/jquery.js"></script>
+<script src="./js/vue.js"></script>
+<script src="./js/vue-router.js"></script>
+<script src="./elemntUI/index.js"></script>
+<!-- 大屏一 -->
+<script type="text/x-template" id='big-sreen-first-js'>
+  <div id='big-sreen-first' class="bg-common-style bg-common-img">
+    <!-- 头部搜索 -->
+    <div class="header-sreach-box">
+      <div class="sreach-input-position">
+        <i class="icon-search bg-common-style"></i>
+        <el-input v-model="sreachValue" placeholder="请输入内容"></el-input>
+        <el-button @click="sreachFrist" class="border-common-style" style="border: 1px dashed #888888;">搜索</el-button>
+      </div>
+    </div>
+    <!-- 内容的展示区 -->
+    <div class="main">
+      <!-- 左边的表格 -->
+      <div class="left-table-content bg-common-style border-common-style">
+        <div class="left-table-title bg-common-style border-common-style">积分排行</div>
+        <!-- 小学表格 -->
+        <div class="primary-table-content">
+          <div class="title-icon-title">
+            <span class="title-icon bg-common-style"></span>
+            <span class="title-text">小学</span>
+          </div>
+          <el-table
+            v-loadmore="laodPrimary"
+            max-height="290"
+            class="primary-table"
+            :data="primaryTableData" 
+            :row-class-name="tableRowClassName"  
+            :header-row-class-name="tableHeaderRowClassName" 
+            style="width: 100%"
+          >
+            <el-table-column prop="index" label="排名"></el-table-column>
+            <el-table-column prop="studentNumber" label="学号" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="studentName" label="姓名"></el-table-column>
+            <el-table-column prop="integral" label="积分"></el-table-column>
+          </el-table>
+        </div>
+        <div class="middle-table-content">
+          <div class="title-icon-title">
+            <span class="title-icon bg-common-style"></span>
+            <span class="title-text">初中</span>
+          </div>
+          <el-table 
+            v-loadmore="loadMiddle"
+            :data="middleTableData" 
+            :row-class-name="tableRowClassName"  
+            :header-row-class-name="tableHeaderRowClassName" 
+            max-height="230" 
+            style="width: 100%"
+          >
+            <el-table-column prop="index" label="排名"></el-table-column>
+            <el-table-column prop="studentNumber" label="学号" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="studentName" label="姓名"></el-table-column>
+            <el-table-column prop="integral" label="积分"></el-table-column>
+          </el-table>
+        </div>
+      </div>
+      <!-- 右边积分商城 -->
+      <div class="right-roll-content border-common-style bg-common-style">
+        <div class="right-table-title bg-common-style">积分排行</div>
+        <div class="right-roll-table-content">
+          <!-- 小学积分商品 -->
+          <div class="right-left-primary">
+            <div class="title-icon-title">
+              <span class="title-icon bg-common-style"></span>
+              <span class="title-text">小学</span>
+            </div>
+            <div class="infinite-list-wrapper" style="overflow: auto;">
+              <ul
+                class="roll-list"
+                v-infinite-scroll="rollLoadPimaryRanking"
+                infinite-scroll-disabled="disabledShopPrimary">
+                <li v-for="(item, index) in primaryShopData" :key="index" class="goods-list-item">
+                  <div class="goods-box">
+                    <img :src="item.goodsImg" :alt="item.goodsName" />
+                  </div>
+                  <div class="goods-info">
+                    <span class="goods-name">{{item.goodsName}}</span>
+                    <span>
+                      <span class="goods-integral-number">{{item.neededIntegral}}</span>
+                      <span class="goods-integral">积分</span>
+                    </span>
+                  </div>
+                </li>
+              </ul>
+              <div style="display: none;">
+                <p v-if="loading">加载中...</p>
+                <p v-if="noShopPrimaryMore">没有更多了</p>
+              </div>
+            </div>
+          </div>
+         <!-- 初中积分商品 -->
+          <div class="right-right-middle">
+            <div class="title-icon-title">
+              <span class="title-icon bg-common-style"></span>
+              <span class="title-text">初中</span>
+            </div>
+            <div class="infinite-list-wrapper" style="overflow: auto;">
+              <ul
+                class="roll-list"
+                v-infinite-scroll="rollLoadMiddleRanking"
+                infinite-scroll-disabled="disabledShopMiddle">
+                <li v-for="(item, index) in middleShopData" :key="index" class="goods-list-item">
+                  <div class="goods-box">
+                    <img :src="item.goodsImg" :alt="item.goodsName" />
+                  </div>
+                  <div class="goods-info">
+                    <span class="goods-name">{{item.goodsName}}</span>
+                    <span>
+                      <span class="goods-integral-number">{{item.neededIntegral}}</span>
+                      <span class="goods-integral">积分</span>
+                    </span>
+                  </div>
+                </li>
+              </ul>
+              <div style="display: none;">
+                <p v-if="loading">加载中...</p>
+                <p v-if="noShopMiddelMore">没有更多了</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<!-- 大屏二 -->
+<script type="text/x-template" id="big-sreen-second-js">
+  <div id='big-sreen-second' class="bg-common-style bg-common-img">
+    <!-- 头部搜索 -->
+    <div class="header-sreach-box">
+      <div class="sreach-input-position">
+        <i class="icon-search bg-common-style"></i>
+        <el-input v-model="sreachValue" placeholder="请输入内容"></el-input>
+        <el-button @click="sreach" class="border-common-style" style="border: 1px dashed #888888;">搜索</el-button>
+      </div>
+    </div>
+    <div class="show-user-info border-common-style">
+      <div class="user-info-content">
+        <div>
+          <div>{{userInfo.rowNo}}</div>
+          <div>排名</div>
+        </div>
+        <div>
+          <div>{{userInfo.studentNumber}}</div>
+          <div>学号</div>
+        </div>
+        <div>
+          <div>{{userInfo.studentName}}</div>
+          <div>姓名</div>
+        </div>
+        <div>
+          <div>{{userInfo.integral}}</div>
+          <div>积分</div>
+        </div>
+      </div>
+    </div>
+    <div class="points-mall border-common-style">
+      <div class="right-table-title bg-common-style">积分排行</div>
+      <div class="sreach-condition">
+        <el-select v-model="fwId" placeholder="积分范围" @change="changePoint">
+          <el-option
+            v-for="item in pointsOption"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+        <el-select v-model="fwId" placeholder="兑换限制">
+          <el-option
+            v-for="item in pointsOption"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </div>
+      <div class="infinite-list-wrapper">
+        <ul
+          class="roll-list"
+          v-infinite-scroll="rollLoad"
+          infinite-scroll-disabled="rollDisabled">
+          <li v-for="(item, index) in pointsData" :key="index" class="goods-list-item">
+            <div class="goods-box">
+              <img :src="item.goodsImg" :alt="item.goodsName" />
+            </div>
+            <div class="goods-info">
+              <span style="display: flex;flex-direction: column;">
+                <span class="goods-name">{{item.goodsName}}</span>
+                <span class="goods-gradeName">{{item.exchangeGradeName}}</span>
+              </span>
+              <span>
+                <span class="goods-integral-number">{{item.neededIntegral}}</span>
+                <span class="goods-integral">积分</span>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <div>
+          <p v-if="loading">加载中...</p>
+          <p v-if="onMore">没有更多了</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  Vue.directive('loadmore', {
+    bind(el, binding) {
+      const selectWrap = el.querySelector('.el-table__body-wrapper');
+      selectWrap.addEventListener('scroll', function() {
+        let sign = 0
+        const scrollDistance = this.scrollHeight - this.scrollTop - this.clientHeight;
+        if (scrollDistance <= sign) {
+          binding.value()
+        }
+      })
+    }
+  })
+  
+  Vue.component("bigSreenFrist", {
+    template: "#big-sreen-first-js",
+    data() {
+      return {
+        sreachValue: "",
+        primaryTableData: [],
+        middleTableData: [],
+        primaryShopData: [],
+        middleShopData: [],
+        loading: false,
+        baseUrl: "https://tyapi.znzkj.net/",
+        leftTopPage: 1,
+        leftTopLimit: 6,
+        leftBottomPage: 1,
+        leftBottomLimit: 5,
+        rightTopPage: 1,
+        rightTopLimit: 6,
+        rightBottomPage: 1,
+        rightBottomLimit: 6,
+        totalPriary: 0,
+        totalMiddle: 0,
+        isPrimaryLoad: false,
+        isMiddleLoad: false
+      }
+    },
+    computed: {
+      noShopPrimaryMore() {
+        return this.rightTopPage >= this.totalPriary;
+      },
+      disabledShopPrimary() {
+        return this.loading || this.noShopPrimaryMore;
+      },
+      noShopMiddelMore() {
+        return this.rightBottomPage >= this.totalMiddle;
+      },
+      disabledShopMiddle() {
+        return this.loading || this.noShopMiddelMore;
+      },
+    },
+    created() {
+      this.getData();
+    },
+    methods: {
+      sreachFrist() {
+        let reg = /^[1-9]\d*$/;
+        if(!reg.test(this.sreachValue)) {
+          return this.$message({message: "请输入正整数", type: 'warning'});
+        }
+        this.$router.push({
+          name:'bigSreenSecond',
+          params: this.sreachValue
+        })
+      },
+      tableRowClassName(row, index) {
+        return index % 2 === 0 ? "table-common-style deep" : "table-common-style shallow";
+      },
+      tableHeaderRowClassName() {
+        return "table-header-style"
+      },
+      laodPrimary() {
+        if(this.isPrimaryLoad) return;
+        this.leftTopPage++;
+        this.postShopData(this.leftTopPage, this.leftTopLimit, 1);
+      },
+      loadMiddle() {
+        if (this.isMiddleLoad) return;
+        this.leftBottomPage++;
+        this.postShopData(this.leftBottomPage, this.leftBottomLimit, 2);
+      },
+      rollLoadPimaryRanking() {
+        setTimeout(() => {
+          this.rightTopPage++;
+          this.postRankingData(this.rightTopPage, this.rightTopLimit, 1);
+        }, 2000);
+      },
+      rollLoadMiddleRanking() {
+        setTimeout(() => {
+          this.rightBottomPage++;
+          this.postRankingData(this.rightBottomPage, this.rightBottomLimit, 2);
+        }, 2000);
+      },
+      getData() {
+        this.postShopData(this.leftTopPage, this.leftTopLimit, 1);
+        this.postShopData(this.leftBottomPage, this.leftBottomLimit, 2);
+        this.postRankingData(this.rightTopPage, this.rightTopLimit, 1);
+        this.postRankingData(this.rightBottomPage, this.rightBottomLimit, 2);
+      },
+      postShopData(page, limit, type) {
+        let that = this;
+        let params = {page, limit, type};
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/user/queryStudentListByIntegral`,
+          data: JSON.stringify(params),
+          contentType: "application/json",
+          success: function(r){
+              if(type === 1) {
+                if(r.page.list.length) {
+                  const primaryTableData = r.page.list.map((item, index) => {
+                    item.index = index + 1 + (that.leftTopPage - 1) * 6; 
+                    return item;
+                  })
+                  that.primaryTableData = [...that.primaryTableData, ...primaryTableData];
+                } else {
+                  that.isPrimaryLoad = true;
+                }
+              } else if(type === 2) {
+                if (r.page.list.length) {
+                  const middleTableData = r.page.list.map((item, index) => {
+                    item.index = index + 1 + (that.leftBottomPage - 1) * 6; 
+                    return item;
+                  })
+                  that.middleTableData = [...that.middleTableData, ...middleTableData];
+                } else {
+                  that.isMiddleLoad = true;
+                }
+              }
+          }
+        });
+      },
+      postRankingData(page, limit, type) {
+        let that = this;
+        let params = {page, limit, type}
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/goods/list`,
+          data: JSON.stringify(params),
+          contentType: "application/json",
+          success: function(r){
+              if(type === 1) {
+                that.primaryShopData = [...that.primaryShopData, ...r.page.list];
+                that.totalPriary = r.page.totalPage;
+              } else if(type === 2) {
+                that.middleShopData = [...that.middleShopData, ...r.page.list];4
+                that.totalMiddle = r.page.totalPage;
+              }
+          }
+        });
+      }
+    }
+  })
+  
+  Vue.component("bigSreenSecond", {
+    template: "#big-sreen-second-js",
+    data() {
+      return {
+        sreachValue: '',
+        baseUrl: 'https://tyapi.znzkj.net/',
+        userInfo: {},
+        pointsOption: [],
+        fwId: "",
+        pointsData: [],
+        page: 1,
+        totalPage: 0,
+        loading: false,
+        isSearch: false
+      }
+    },
+    created() {
+      this.sreachValue = this.$route.params;
+      this.getUserInfo();
+      this.getPointsShop();
+      this.getPointsList();
+    },
+    computed: {
+      rollDisabled() {
+        return this.loading || this.onMore;
+      },
+      onMore() {
+        return this.page >= this.totalPage;
+      }
+    },
+    methods: {
+      sreach() {
+        let reg = /^[1-9]\d*$/;
+        if(!reg.test(this.sreachValue)) {
+          return this.$message({message: "请输入正整数", type: 'warning'});
+        }
+        this.getUserInfo();
+        this.getPointsShop();
+      },
+      changePoint(value) {
+        this.fwId = value;
+        this.isSearch = true;
+        this.getPointsShop()
+      },
+      rollLoad() {
+        setTimeout(() => {
+          this.page++;
+          this.getPointsShop();
+        }, 2000);
+      },
+      getPointsList() {
+        let that = this;
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/sysdict/getListByType`,
+          data: JSON.stringify({type: "7"}),
+          contentType: "application/json",
+          success: function(r){
+            that.pointsOption = {...r.object};
+          }
+        });
+      },
+      getUserInfo() {
+        let that = this;
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/user/queryUserInfoByStudentNumber`,
+          data: JSON.stringify({studentNumber: this.sreachValue}),
+          contentType: "application/json",
+          success: function(r){
+            that.userInfo = {...r.object};
+          }
+        });
+      },
+      getPointsShop() {
+        let that = this;
+        let params = {
+          page: this.page,
+          limit: 12,
+          type: 1,
+        }
+        this.fwId && (params.fwId = this.fwId);
+        this.isSearch && (that.pointsData.length = 0);
+        $.ajax({
+          type: "POST",
+          url: `${this.baseUrl}qljyapi/goods/list`,
+          data: JSON.stringify(params),
+          contentType: "application/json",
+          success: function(r){
+            that.pointsData.push(...r.page.list);
+            that.totalPage = r.page.totalPage;
+          }
+        });
+      }
+    }
+  })
+  
+  const router = new VueRouter({
+    routes: [
+      {path: "/bigSreenFrist", name: "bigSreenFrist", component: "bigSreenFrist"},
+      {path: "/bigSreenSecond", name: "bigSreenSecond", component: "bigSreenSecond"},
+      {path: "/", redirect: "/bigSreenFrist"}
+    ]
+  })
+  
+  new Vue({
+    el: "#big-sreen",
+    router,
+    data() {
+      return {
+
+      }
+    }
+  })
+</script>
+</html>
