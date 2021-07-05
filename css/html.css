@@ -59,6 +59,7 @@
 #big-sreen-first .el-table td, .el-table th.is-leaf {
   text-align: center;
   background-color: #163157;
+  border: none;
 }
 #big-sreen-first .table-header-style th {
   height: 46px;

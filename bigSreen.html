@@ -44,7 +44,7 @@
           </div>
           <el-table
             v-loadmore="laodPrimary"
-            max-height="290"
+            max-height="280"
             class="primary-table"
             :data="primaryTableData" 
             :row-class-name="tableRowClassName"  
@@ -67,7 +67,7 @@
             :data="middleTableData" 
             :row-class-name="tableRowClassName"  
             :header-row-class-name="tableHeaderRowClassName" 
-            max-height="230" 
+            max-height="285" 
             style="width: 100%"
           >
             <el-table-column prop="index" label="排名"></el-table-column>
@@ -188,12 +188,12 @@
             :value="item.id">
           </el-option>
         </el-select>
-        <el-select v-model="fwId" placeholder="兑换限制">
+        <el-select v-model="type" placeholder="兑换限制" @change="changType">
           <el-option
-            v-for="item in pointsOption"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
+            v-for="item in typesOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </div>
@@ -254,7 +254,7 @@
         leftTopPage: 1,
         leftTopLimit: 6,
         leftBottomPage: 1,
-        leftBottomLimit: 5,
+        leftBottomLimit: 6,
         rightTopPage: 1,
         rightTopLimit: 6,
         rightBottomPage: 1,
@@ -262,7 +262,7 @@
         totalPriary: 0,
         totalMiddle: 0,
         isPrimaryLoad: false,
-        isMiddleLoad: false
+        isMiddleLoad: false,
       }
     },
     computed: {
@@ -285,7 +285,7 @@
     methods: {
       sreachFrist() {
         let reg = /^[1-9]\d*$/;
-        if(!reg.test(this.sreachValue)) {
+        if(this.sreachValue && !reg.test(this.sreachValue)) {
           return this.$message({message: "请输入正整数", type: 'warning'});
         }
         this.$router.push({
@@ -339,7 +339,8 @@
               if(type === 1) {
                 if(r.page.list.length) {
                   const primaryTableData = r.page.list.map((item, index) => {
-                    item.index = index + 1 + (that.leftTopPage - 1) * 6; 
+                    item.index = index + 1 + (that.leftTopPage - 1) * that.leftTopLimit; 
+                    console.log(item.index, "=>>item.index")
                     return item;
                   })
                   that.primaryTableData = [...that.primaryTableData, ...primaryTableData];
@@ -349,7 +350,7 @@
               } else if(type === 2) {
                 if (r.page.list.length) {
                   const middleTableData = r.page.list.map((item, index) => {
-                    item.index = index + 1 + (that.leftBottomPage - 1) * 6; 
+                    item.index = index + 1 + (that.leftBottomPage - 1) * that.leftBottomLimit; 
                     return item;
                   })
                   that.middleTableData = [...that.middleTableData, ...middleTableData];
@@ -395,7 +396,13 @@
         page: 1,
         totalPage: 0,
         loading: false,
-        isSearch: false
+        isSearch: false,
+        type: undefined,
+        typesOption: [
+          {label: '小学', value: 1},
+          {label: '初中', value: 2},
+          {label: '高中', value: 3},
+        ]
       }
     },
     created() {
@@ -415,7 +422,7 @@
     methods: {
       sreach() {
         let reg = /^[1-9]\d*$/;
-        if(!reg.test(this.sreachValue)) {
+        if(this.sreachValue && !reg.test(this.sreachValue)) {
           return this.$message({message: "请输入正整数", type: 'warning'});
         }
         this.getUserInfo();
@@ -424,7 +431,12 @@
       changePoint(value) {
         this.fwId = value;
         this.isSearch = true;
-        this.getPointsShop()
+        this.getPointsShop();
+      },
+      changType(value) {
+        this.type = value;
+        this.isSearch = true;
+        this.getPointsShop();
       },
       rollLoad() {
         setTimeout(() => {
@@ -461,7 +473,7 @@
         let params = {
           page: this.page,
           limit: 12,
-          type: 1,
+          type: this.type,
         }
         this.fwId && (params.fwId = this.fwId);
         this.isSearch && (that.pointsData.length = 0);
