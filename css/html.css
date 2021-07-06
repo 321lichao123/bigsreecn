@@ -166,6 +166,7 @@
 #big-sreen-second .user-info-content > div {
   width: 13%;
   text-align: center;
+  padding: 0 15px;
 }
 #big-sreen-second .user-info-content > div div:last-child {
   font-size: 22px;
@@ -283,4 +284,10 @@
   background: #010233;
   box-shadow: 0 0 13px 8px rgb(35 111 132 / 50%) inse
 }
-
+.loadMore {
+  font-size: 22px;
+  font-weight: 500;
+  color: #FFFFFF;
+  line-height: 30px;
+  letter-spacing: 2px;
+}

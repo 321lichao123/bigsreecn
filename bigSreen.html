@@ -91,7 +91,10 @@
               <ul
                 class="roll-list"
                 v-infinite-scroll="rollLoadPimaryRanking"
-                infinite-scroll-disabled="disabledShopPrimary">
+                infinite-scroll-disabled="disabledShopPrimary"
+                infinite-scroll-distance="700"
+                infinite-scroll-immediate="false"
+                infinite-scroll-delay="500">
                 <li v-for="(item, index) in primaryShopData" :key="index" class="goods-list-item">
                   <div class="goods-box">
                     <img :src="item.goodsImg" :alt="item.goodsName" />
@@ -121,7 +124,10 @@
               <ul
                 class="roll-list"
                 v-infinite-scroll="rollLoadMiddleRanking"
-                infinite-scroll-disabled="disabledShopMiddle">
+                infinite-scroll-disabled="disabledShopMiddle"
+                infinite-scroll-distance="700"
+                infinite-scroll-immediate="false"
+                infinite-scroll-delay="500">
                 <li v-for="(item, index) in middleShopData" :key="index" class="goods-list-item">
                   <div class="goods-box">
                     <img :src="item.goodsImg" :alt="item.goodsName" />
@@ -201,7 +207,10 @@
         <ul
           class="roll-list"
           v-infinite-scroll="rollLoad"
-          infinite-scroll-disabled="rollDisabled">
+          infinite-scroll-disabled="rollDisabled"
+          infinite-scroll-distance="500"
+          infinite-scroll-immediate="false"
+          infinite-scroll-delay="500">
           <li v-for="(item, index) in pointsData" :key="index" class="goods-list-item">
             <div class="goods-box">
               <img :src="item.goodsImg" :alt="item.goodsName" />
@@ -218,7 +227,7 @@
             </div>
           </li>
         </ul>
-        <div>
+        <div style="display: none;">
           <p v-if="loading">加载中...</p>
           <p v-if="onMore">没有更多了</p>
         </div>
@@ -233,6 +242,7 @@
       selectWrap.addEventListener('scroll', function() {
         let sign = 0
         const scrollDistance = this.scrollHeight - this.scrollTop - this.clientHeight;
+        console.log(scrollDistance, "==>>scrollDistance")
         if (scrollDistance <= sign) {
           binding.value()
         }
@@ -425,15 +435,18 @@
         if(this.sreachValue && !reg.test(this.sreachValue)) {
           return this.$message({message: "请输入正整数", type: 'warning'});
         }
+        this.page = 1;
         this.getUserInfo();
         this.getPointsShop();
       },
       changePoint(value) {
+        this.page = 1;
         this.fwId = value;
         this.isSearch = true;
         this.getPointsShop();
       },
       changType(value) {
+        this.page = 1;
         this.type = value;
         this.isSearch = true;
         this.getPointsShop();
