@@ -43,7 +43,7 @@
             <span class="title-text">小学</span>
           </div>
           <el-table
-            v-loadmore="laodPrimary"
+            ref="primaryTable"
             max-height="280"
             class="primary-table"
             :data="primaryTableData" 
@@ -53,7 +53,7 @@
           >
             <el-table-column prop="index" label="排名"></el-table-column>
             <el-table-column prop="studentNumber" label="学号" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="studentName" label="姓名"></el-table-column>
+            <el-table-column prop="studentName" label="姓名" show-overflow-tooltip></el-table-column>
             <el-table-column prop="integral" label="积分"></el-table-column>
           </el-table>
         </div>
@@ -63,11 +63,11 @@
             <span class="title-text">初中</span>
           </div>
           <el-table 
-            v-loadmore="loadMiddle"
+            ref="middleTable"
             :data="middleTableData" 
             :row-class-name="tableRowClassName"  
             :header-row-class-name="tableHeaderRowClassName" 
-            max-height="285" 
+            max-height="280" 
             style="width: 100%"
           >
             <el-table-column prop="index" label="排名"></el-table-column>
@@ -79,7 +79,7 @@
       </div>
       <!-- 右边积分商城 -->
       <div class="right-roll-content border-common-style bg-common-style">
-        <div class="right-table-title bg-common-style">积分排行</div>
+        <div class="right-table-title bg-common-style">积分商城</div>
         <div class="right-roll-table-content">
           <!-- 小学积分商品 -->
           <div class="right-left-primary">
@@ -87,15 +87,20 @@
               <span class="title-icon bg-common-style"></span>
               <span class="title-text">小学</span>
             </div>
-            <div class="infinite-list-wrapper" style="overflow: auto;">
-              <ul
+            <div class="infinite-list-wrapper infinite-primary-list-wrapper" style="overflow: auto;">
+              <!-- <ul
                 class="roll-list"
                 v-infinite-scroll="rollLoadPimaryRanking"
                 infinite-scroll-disabled="disabledShopPrimary"
                 infinite-scroll-distance="700"
                 infinite-scroll-immediate="false"
-                infinite-scroll-delay="500">
-                <li v-for="(item, index) in primaryShopData" :key="index" class="goods-list-item">
+                infinite-scroll-delay="500"> -->
+              <ul class="roll-list">
+                <li 
+                  v-for="(item, index) in primaryShopData" 
+                  :key="index" 
+                  class="goods-list-item"
+                >
                   <div class="goods-box">
                     <img :src="item.goodsImg" :alt="item.goodsName" />
                   </div>
@@ -108,10 +113,6 @@
                   </div>
                 </li>
               </ul>
-              <div style="display: none;">
-                <p v-if="loading">加载中...</p>
-                <p v-if="noShopPrimaryMore">没有更多了</p>
-              </div>
             </div>
           </div>
          <!-- 初中积分商品 -->
@@ -120,15 +121,20 @@
               <span class="title-icon bg-common-style"></span>
               <span class="title-text">初中</span>
             </div>
-            <div class="infinite-list-wrapper" style="overflow: auto;">
-              <ul
+            <div class="infinite-list-wrapper infinite-middle-list-wrapper" style="overflow: auto;">
+              <!-- <ul
                 class="roll-list"
                 v-infinite-scroll="rollLoadMiddleRanking"
                 infinite-scroll-disabled="disabledShopMiddle"
                 infinite-scroll-distance="700"
                 infinite-scroll-immediate="false"
-                infinite-scroll-delay="500">
-                <li v-for="(item, index) in middleShopData" :key="index" class="goods-list-item">
+                infinite-scroll-delay="500"> -->
+              <ul class="roll-list">
+                <li 
+                  v-for="(item, index) in middleShopData" 
+                  :key="index" 
+                  class="goods-list-item"
+                >
                   <div class="goods-box">
                     <img :src="item.goodsImg" :alt="item.goodsName" />
                   </div>
@@ -141,10 +147,6 @@
                   </div>
                 </li>
               </ul>
-              <div style="display: none;">
-                <p v-if="loading">加载中...</p>
-                <p v-if="noShopMiddelMore">没有更多了</p>
-              </div>
             </div>
           </div>
         </div>
@@ -218,7 +220,7 @@
             <div class="goods-info">
               <span style="display: flex;flex-direction: column;">
                 <span class="goods-name">{{item.goodsName}}</span>
-                <span class="goods-gradeName">{{item.exchangeGradeName}}</span>
+                <span class="goods-gradeName">{{item.type === 1 ? "小学" : "初中"}}</span>
               </span>
               <span>
                 <span class="goods-integral-number">{{item.neededIntegral}}</span>
@@ -236,19 +238,6 @@
   </div>
 </script>
 <script>
-  Vue.directive('loadmore', {
-    bind(el, binding) {
-      const selectWrap = el.querySelector('.el-table__body-wrapper');
-      selectWrap.addEventListener('scroll', function() {
-        let sign = 0
-        const scrollDistance = this.scrollHeight - this.scrollTop - this.clientHeight;
-        console.log(scrollDistance, "==>>scrollDistance")
-        if (scrollDistance <= sign) {
-          binding.value()
-        }
-      })
-    }
-  })
   
   Vue.component("bigSreenFrist", {
     template: "#big-sreen-first-js",
@@ -262,17 +251,23 @@
         loading: false,
         baseUrl: "https://tyapi.znzkj.net/",
         leftTopPage: 1,
-        leftTopLimit: 6,
+        leftTopLimit: 20,
         leftBottomPage: 1,
-        leftBottomLimit: 6,
+        leftBottomLimit: 20,
         rightTopPage: 1,
-        rightTopLimit: 6,
+        rightTopLimit: 20,
         rightBottomPage: 1,
-        rightBottomLimit: 6,
+        rightBottomLimit: 20,
         totalPriary: 0,
         totalMiddle: 0,
         isPrimaryLoad: false,
         isMiddleLoad: false,
+        isPrimaryRankLoad: false,
+        isMiddleRankLoad: false,
+        primaryRollTime: null,
+        middleRollTime: null,
+        pimaryRankingTime: null,
+        middleRankingTime: null,
       }
     },
     computed: {
@@ -292,11 +287,22 @@
     created() {
       this.getData();
     },
+    mounted() {
+      setTimeout(() => {
+        this.autoRollPrimary();
+        this.autoRollMiddle();
+        this.autoPimaryRanking();
+        this.autoMiddleRanking();
+      }, 500);
+    },
     methods: {
       sreachFrist() {
         let reg = /^[1-9]\d*$/;
-        if(this.sreachValue && !reg.test(this.sreachValue)) {
-          return this.$message({message: "请输入正整数", type: 'warning'});
+        if(!this.sreachValue) {
+          return this.$message({message: "请输入学号", type: 'warning'});
+        }
+        if(!reg.test(this.sreachValue)) {
+          return this.$message({message: "请输入正确学号", type: 'warning'});
         }
         this.$router.push({
           name:'bigSreenSecond',
@@ -309,27 +315,75 @@
       tableHeaderRowClassName() {
         return "table-header-style"
       },
-      laodPrimary() {
-        if(this.isPrimaryLoad) return;
-        this.leftTopPage++;
-        this.postShopData(this.leftTopPage, this.leftTopLimit, 1);
+      autoRollPrimary() {
+        let selectWrap = this.$refs.primaryTable;
+        let divData = selectWrap.bodyWrapper;
+        let count = 0;
+        this.primaryRollTime = setInterval(() => {
+          count++;
+          divData.scrollTop = divData.scrollTop + 47;
+          if(!this.isPrimaryLoad && count === (this.leftTopLimit / 2)) {
+            this.leftTopPage++;
+            this.postShopData(this.leftTopPage, this.leftTopLimit, 1);
+            count = 0;
+          } else if (this.isPrimaryLoad) {
+            const primaryTableData = [...this.primaryTableData];
+            const arr = primaryTableData.splice(0, 1);
+            this.primaryTableData = [...primaryTableData, ...arr];
+          }
+        }, 1000)
       },
-      loadMiddle() {
-        if (this.isMiddleLoad) return;
-        this.leftBottomPage++;
-        this.postShopData(this.leftBottomPage, this.leftBottomLimit, 2);
+      autoRollMiddle() {
+        let selectWrap = this.$refs.middleTable;
+        let divData = selectWrap.bodyWrapper;
+        let count = 0;
+        this.middleRollTime = setInterval(() => {
+          count++;
+          divData.scrollTop = divData.scrollTop + 47;
+          if(!this.isMiddleLoad && count === (this.leftBottomLimit / 2)) {
+            this.leftBottomPage++;
+            this.postShopData(this.leftBottomPage, this.leftBottomLimit, 2);
+            count = 0;
+          } else if (this.isMiddleLoad) {
+            const middleTableData = [...this.middleTableData];
+            const arr = middleTableData.splice(0, 1);
+            this.middleTableData = [...middleTableData, ...arr];
+          }
+        }, 1000)
       },
-      rollLoadPimaryRanking() {
-        setTimeout(() => {
-          this.rightTopPage++;
-          this.postRankingData(this.rightTopPage, this.rightTopLimit, 1);
-        }, 2000);
+      autoPimaryRanking() {
+        let srollBox = document.querySelector(".infinite-primary-list-wrapper");
+        let count = 0;
+        this.pimaryRankingTime = setInterval(() => {
+          count++;
+          srollBox.scrollTop = srollBox.scrollTop + 211;
+          if(!this.isPrimaryRankLoad && count === (this.rightTopLimit / 2)) {
+            this.rightTopPage++;
+            this.postRankingData(this.rightTopPage, this.rightTopLimit, 1);
+            count = 0;
+          } else if (this.isPrimaryRankLoad) {
+            const primaryShopData = [...this.primaryShopData];
+            const arr = primaryShopData.splice(0, 2);
+            this.primaryShopData = [...primaryShopData, ...arr];
+          }
+        }, 1000)
       },
-      rollLoadMiddleRanking() {
-        setTimeout(() => {
-          this.rightBottomPage++;
-          this.postRankingData(this.rightBottomPage, this.rightBottomLimit, 2);
-        }, 2000);
+      autoMiddleRanking() {
+        let srollBox = document.querySelector(".infinite-middle-list-wrapper");
+        let count = 0;
+        this.middleRankingTime = setInterval(() => {
+          count++;
+          srollBox.scrollTop = srollBox.scrollTop + 211;
+          if(!this.isMiddleRankLoad && count === (this.rightBottomLimit / 2)) {
+            this.rightBottomPage++;
+            this.postRankingData(this.rightBottomPage, this.rightBottomLimit, 2);
+            count = 0;
+          } else if (this.isMiddleRankLoad) {
+            const middleShopData = [...this.middleShopData];
+            const arr = middleShopData.splice(0, 2);
+            this.middleShopData = [...middleShopData, ...arr];
+          }
+        }, 1000)
       },
       getData() {
         this.postShopData(this.leftTopPage, this.leftTopLimit, 1);
@@ -350,7 +404,6 @@
                 if(r.page.list.length) {
                   const primaryTableData = r.page.list.map((item, index) => {
                     item.index = index + 1 + (that.leftTopPage - 1) * that.leftTopLimit; 
-                    console.log(item.index, "=>>item.index")
                     return item;
                   })
                   that.primaryTableData = [...that.primaryTableData, ...primaryTableData];
@@ -381,15 +434,29 @@
           contentType: "application/json",
           success: function(r){
               if(type === 1) {
-                that.primaryShopData = [...that.primaryShopData, ...r.page.list];
-                that.totalPriary = r.page.totalPage;
+                if(r.page.list.length) {
+                  that.primaryShopData = [...that.primaryShopData, ...r.page.list];
+                  that.totalPriary = r.page.totalPage;
+                } else {
+                  that.isPrimaryRankLoad = true;
+                }
               } else if(type === 2) {
-                that.middleShopData = [...that.middleShopData, ...r.page.list];4
-                that.totalMiddle = r.page.totalPage;
+                if(r.page.list.length) {
+                  that.middleShopData = [...that.middleShopData, ...r.page.list];4
+                  that.totalMiddle = r.page.totalPage;
+                } else {
+                  that.isMiddleRankLoad = true;
+                }
               }
           }
         });
       }
+    },
+    destroyed() {
+      clearInterval(this.primaryRollTime);
+      clearInterval(this.middleRollTime);
+      clearInterval(this.pimaryRankingTime);
+      clearInterval(this.middleRankingTime);
     }
   })
   
@@ -411,7 +478,7 @@
         typesOption: [
           {label: '小学', value: 1},
           {label: '初中', value: 2},
-          {label: '高中', value: 3},
+          // {label: '高中', value: 3},
         ]
       }
     },
@@ -432,8 +499,11 @@
     methods: {
       sreach() {
         let reg = /^[1-9]\d*$/;
-        if(this.sreachValue && !reg.test(this.sreachValue)) {
-          return this.$message({message: "请输入正整数", type: 'warning'});
+        if(!this.sreachValue) {
+          return this.$message({message: "请输入学号", type: 'warning'});
+        }
+        if(!reg.test(this.sreachValue)) {
+          return this.$message({message: "请输入正确学号", type: 'warning'});
         }
         this.page = 1;
         this.getUserInfo();
