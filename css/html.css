@@ -140,6 +140,15 @@
 }
 #big-sreen-first .goods-name {
   font-size: 18px;
+  height: 50px;
+  line-height: 50px;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 #big-sreen-first .goods-integral-number {
   font-size: 26px;
@@ -259,6 +268,14 @@
 #big-sreen-second .goods-name {
   margin-bottom: 6px;
   font-size: 18px;
+  height: 40px;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 #big-sreen-second .goods-integral-number {
   font-size: 26px;
@@ -268,11 +285,13 @@
   font-size: 12px;
 }
 #big-sreen-second .goods-gradeName {
-  padding: 7px 8px;
   font-size: 14px;
   text-align: center;
   border: 1px solid #CFD7F3;
   border-radius: 100px;
+  height: 22px;
+  line-height: 22px;
+  width: 43px;
 }
 
 #big-sreen-second .el-button:active {
